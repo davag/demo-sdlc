@@ -1,0 +1,165 @@
+# Product Requirements Document: Task Management App with Priority Filtering
+
+## Executive Summary
+Build a modern task management application that allows users to create, organize, and filter tasks by priority levels. The app should provide an intuitive interface with real-time updates and smooth user experience.
+
+## Problem Statement
+Teams and individuals need a simple yet effective way to manage tasks with priority-based filtering to focus on what matters most. Current solutions are either too complex or lack proper priority management features.
+
+## Solution Overview
+Create a React-based task management app with the following core features:
+- Task creation with priority assignment (High, Medium, Low)
+- Priority-based filtering system
+- Task status management (Todo, In Progress, Completed)
+- Clean, responsive UI with dark/light theme support
+- Real-time task updates
+
+## Technical Requirements
+
+### Technology Stack (as defined in .cursorrules)
+- **Frontend Framework**: React 18 with TypeScript (strict mode)
+- **Build Tool**: Vite for fast development and optimized builds
+- **Styling**: Tailwind CSS for utility-first styling
+- **State Management**: Zustand for lightweight, scalable state management
+- **Icons**: Lucide React for consistent iconography
+- **Testing**: Vitest for unit and integration testing
+- **Routing**: React Router DOM for navigation
+- **Code Quality**: ESLint + TypeScript for code quality enforcement
+
+### Architecture Constraints
+- Follow cursor rules defined in .cursorrules file
+- Use functional components with hooks (no class components)
+- Implement proper TypeScript interfaces for all data structures
+- Components must be under 100 lines when possible
+- Use proper error boundaries and error handling
+- Maintain accessibility standards (ARIA labels, keyboard navigation)
+- Implement responsive design (mobile-first approach)
+
+### File Structure Requirements
+- `/src/components/` - Reusable UI components (PascalCase naming)
+- `/src/pages/` - Page-level components
+- `/src/hooks/` - Custom hooks (usePrefix naming)
+- `/src/store/` - Zustand store definitions
+- `/src/types/` - TypeScript type definitions
+- `/src/utils/` - Utility functions
+
+### Development Standards
+- All components must have proper TypeScript interfaces
+- Use arrow functions for component definitions
+- Implement proper error handling with try-catch for async operations
+- Add JSDoc comments for complex functions
+- Use semantic HTML elements for accessibility
+- Implement proper loading states and error messages
+- Follow React best practices (proper key props, avoiding unnecessary re-renders)
+
+## Core Features
+
+### 1. Task Management
+- Create new tasks with title, description, and priority
+- Edit existing tasks
+- Delete tasks with confirmation
+- Mark tasks as complete/incomplete
+
+### 2. Priority System
+- Three priority levels: High (Red), Medium (Yellow), Low (Green)
+- Visual indicators for each priority level
+- Default priority assignment (Medium)
+
+### 3. Filtering System
+- Filter by priority (All, High, Medium, Low)
+- Filter by status (All, Todo, In Progress, Completed)
+- Combine multiple filters
+- Clear all filters option
+
+### 4. User Interface
+- Clean, modern design following Material Design principles
+- Responsive layout (mobile, tablet, desktop)
+- Dark/Light theme toggle
+- Smooth animations and transitions
+- Loading states for all async operations
+
+### 5. Data Persistence
+- Store tasks in localStorage for demo purposes
+- Maintain filter preferences across sessions
+- Preserve theme selection
+
+## User Stories
+
+### Epic 1: Task Creation and Management
+- As a user, I can create a new task with a title, description, and priority
+- As a user, I can edit existing tasks
+- As a user, I can delete tasks I no longer need
+- As a user, I can mark tasks as complete or incomplete
+
+### Epic 2: Priority-Based Organization
+- As a user, I can assign priority levels to my tasks
+- As a user, I can filter tasks by priority to focus on important items
+- As a user, I can see visual indicators for different priority levels
+
+### Epic 3: User Experience
+- As a user, I can switch between dark and light themes
+- As a user, I can use the app on mobile and desktop devices
+- As a user, I can see loading states and error messages
+- As a user, I can navigate the app using keyboard shortcuts
+
+## Technical Implementation Details
+
+### Data Models
+```typescript
+interface Task {
+  id: string;
+  title: string;
+  description: string;
+  priority: 'high' | 'medium' | 'low';
+  status: 'todo' | 'in-progress' | 'completed';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface FilterState {
+  priority: 'all' | 'high' | 'medium' | 'low';
+  status: 'all' | 'todo' | 'in-progress' | 'completed';
+}
+```
+
+### Component Architecture
+- **App**: Main application component with routing
+- **TaskList**: Display filtered tasks
+- **TaskItem**: Individual task component
+- **TaskForm**: Create/edit task form
+- **FilterBar**: Priority and status filters
+- **ThemeToggle**: Dark/light theme switcher
+- **Header**: Application header with navigation
+
+### State Management
+- Use Zustand for global state (tasks, filters, theme)
+- Local component state for form inputs and UI states
+- Proper TypeScript interfaces for all store states
+
+## Success Metrics
+- Users can create and manage tasks efficiently
+- Priority filtering helps users focus on important tasks
+- App is responsive and accessible across devices
+- Code follows all cursor rules and maintains high quality
+- Zero accessibility violations in audit
+- All TypeScript strict mode requirements met
+
+## Constraints and Limitations
+- Demo project scope (no backend integration)
+- Use localStorage for data persistence
+- Follow all cursor rules without exceptions
+- Maximum 100 lines per component where possible
+- All components must be fully typed with TypeScript
+
+## Timeline
+- **Phase 1**: Setup and basic task creation (2-3 hours)
+- **Phase 2**: Priority system and filtering (1-2 hours)
+- **Phase 3**: UI polish and theming (1-2 hours)
+- **Phase 4**: Testing and accessibility (1 hour)
+
+## Future Enhancements (Out of Scope)
+- Backend integration
+- User authentication
+- Task sharing and collaboration
+- Due dates and reminders
+- Task categories and tags 

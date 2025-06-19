@@ -1,18 +1,27 @@
-import React from 'react'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Header from './components/Header';
+import TasksPage from './pages/TasksPage';
 
 const App: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-          Task Management App
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Welcome to your task management application. Setup is complete!
-        </p>
+    <Router>
+      <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
+        <Header />
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<TasksPage />} />
+            {/* Add more routes here as needed */}
+          </Routes>
+        </main>
+        <footer className="py-4 text-center text-sm text-gray-500 dark:text-gray-400 border-t dark:border-gray-700 bg-white dark:bg-gray-800">
+          <div className="container mx-auto px-4">
+            Task Management App &copy; {new Date().getFullYear()}
+          </div>
+        </footer>
       </div>
-    </div>
-  )
-}
+    </Router>
+  );
+};
 
-export default App 
+export default App; 

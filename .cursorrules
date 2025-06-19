@@ -1,0 +1,64 @@
+# Cursor Rules for Task Management App Demo
+
+## Technology Stack
+- **Frontend**: React 18 with TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS
+- **State Management**: Zustand
+- **Icons**: Lucide React
+- **Testing**: Vitest
+- **Routing**: React Router DOM
+
+## Code Standards
+- Use TypeScript with strict mode enabled
+- Prefer functional components with hooks
+- Use arrow functions for component definitions
+- Implement proper TypeScript interfaces for all props and state
+- Use Tailwind CSS for styling (no custom CSS files unless absolutely necessary)
+- Follow React best practices (useState, useEffect, custom hooks)
+- Use meaningful variable and function names
+- Add JSDoc comments for complex functions
+
+## File Structure
+- Components in `src/components/` with PascalCase naming
+- Custom hooks in `src/hooks/` with `use` prefix
+- Types in `src/types/` with descriptive names
+- Store files in `src/store/` 
+- Pages in `src/pages/`
+- Utilities in `src/utils/`
+
+## Component Guidelines
+- Export components as default exports
+- Define interfaces for props above the component
+- Use destructuring for props
+- Keep components small and focused (< 100 lines when possible)
+- Use proper TypeScript typing for all props, state, and function parameters
+
+## State Management
+- Use Zustand for global state
+- Keep local state with useState for component-specific data
+- Use proper TypeScript interfaces for store state
+
+## Testing
+- Write unit tests for utility functions
+- Test components with user interactions
+- Use descriptive test names
+- Mock external dependencies
+
+## Error Handling
+- Implement proper error boundaries
+- Use try-catch for async operations
+- Provide user-friendly error messages
+- Log errors appropriately
+
+## Performance
+- Use React.memo for expensive components
+- Implement proper key props for lists
+- Avoid unnecessary re-renders
+- Use lazy loading for routes when appropriate
+
+## Accessibility
+- Use semantic HTML elements
+- Implement proper ARIA labels
+- Ensure keyboard navigation
+- Maintain proper color contrast ratios 

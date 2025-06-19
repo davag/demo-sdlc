@@ -1,0 +1,87 @@
+# Task ID: 2
+# Title: Define TypeScript Interfaces and Data Models
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Create TypeScript interfaces for the Task and FilterState data models as specified in the PRD.
+# Details:
+Create a file at `/src/types/index.ts` with the following content:
+
+```typescript
+export interface Task {
+  id: string;
+  title: string;
+  description: string;
+  priority: 'high' | 'medium' | 'low';
+  status: 'todo' | 'in-progress' | 'completed';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface FilterState {
+  priority: 'all' | 'high' | 'medium' | 'low';
+  status: 'all' | 'todo' | 'in-progress' | 'completed';
+}
+
+// Theme type
+export type Theme = 'light' | 'dark';
+
+// Color mapping for priority levels
+export const PRIORITY_COLORS = {
+  high: 'text-red-500',
+  medium: 'text-yellow-500',
+  low: 'text-green-500'
+};
+
+// Status display names
+export const STATUS_LABELS = {
+  'todo': 'To Do',
+  'in-progress': 'In Progress',
+  'completed': 'Completed'
+};
+```
+<info added on 2025-06-19T12:58:32.158Z>
+I've implemented the TypeScript interfaces and data models as specified in the PRD. The file has been created at `/src/types/index.ts` and includes all required interfaces and constants:
+
+- Task interface with all required properties (id, title, description, priority, status, timestamps)
+- FilterState interface for the filtering system
+- Theme type for theme switching
+- PRIORITY_COLORS constant for consistent visual styling
+- STATUS_LABELS constant for user-friendly display
+
+Additionally, I've added:
+- PRIORITY_OPTIONS and STATUS_OPTIONS constants for dropdown/select options
+- Comprehensive JSDoc documentation
+- Type safety with `as const` assertions
+
+All TypeScript compilation checks pass without errors, and the code is ready for use in the upcoming Zustand store implementation (Task #3).
+</info added on 2025-06-19T12:58:32.158Z>
+
+# Test Strategy:
+Create unit tests using Vitest to verify that the TypeScript interfaces are correctly defined. Test that the type constraints work as expected by creating sample objects that conform to the interfaces and checking for TypeScript errors when invalid values are used.
+
+# Subtasks:
+## 1. Create Task and FilterState interfaces [done]
+### Dependencies: None
+### Description: Define the core Task and FilterState interfaces that will be used throughout the application for type safety and data structure consistency.
+### Details:
+Create the `/src/types/index.ts` file and implement the Task interface with properties for id, title, description, priority, status, createdAt, and updatedAt. Then implement the FilterState interface with properties for priority and status filters. Ensure proper typing for all enum-like fields using union types.
+
+## 2. Define Theme type and implement theme-related utilities [done]
+### Dependencies: None
+### Description: Create the Theme type definition to support light and dark mode functionality in the application.
+### Details:
+In the same `/src/types/index.ts` file, add the Theme type definition as a union type of 'light' and 'dark'. This will be used for theme switching functionality throughout the application.
+
+## 3. Implement PRIORITY_COLORS constant [done]
+### Dependencies: None
+### Description: Create a mapping between priority levels and their corresponding color classes for consistent styling across the application.
+### Details:
+Add the PRIORITY_COLORS constant to the types file that maps each priority level ('high', 'medium', 'low') to its corresponding Tailwind CSS color class. This will ensure consistent color coding of priorities throughout the UI.
+
+## 4. Implement STATUS_LABELS constant [done]
+### Dependencies: 2.3
+### Description: Create a mapping between status values and their human-readable display labels for consistent terminology in the UI.
+### Details:
+Add the STATUS_LABELS constant to the types file that maps each status value ('todo', 'in-progress', 'completed') to its user-friendly display name. This will be used to display status values consistently throughout the application.
+

@@ -1,0 +1,118 @@
+# Task ID: 3
+# Title: Implement Zustand Store for State Management
+# Status: pending
+# Dependencies: 2
+# Priority: high
+# Description: Create a Zustand store to manage tasks, filter state, and theme preferences with proper TypeScript typing.
+# Details:
+Create a file at `/src/store/taskStore.ts` with the following content:
+
+```typescript
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { Task, FilterState, Theme } from '../types';
+
+interface TaskState {
+  tasks: Task[];
+  filters: FilterState;
+  theme: Theme;
+  // Actions
+  addTask: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  updateTask: (id: string, updates: Partial<Omit<Task, 'id' | 'createdAt'>>) => void;
+  deleteTask: (id: string) => void;
+  setFilter: (filters: Partial<FilterState>) => void;
+  clearFilters: () => void;
+  toggleTheme: () => void;
+}
+
+const useTaskStore = create<TaskState>(
+  persist(
+    (set) => ({
+      tasks: [],
+      filters: {
+        priority: 'all',
+        status: 'all',
+      },
+      theme: 'light',
+      
+      addTask: (taskData) => set((state) => {
+        const newTask: Task = {
+          ...taskData,
+          id: crypto.randomUUID(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        return { tasks: [...state.tasks, newTask] };
+      }),
+      
+      updateTask: (id, updates) => set((state) => ({
+        tasks: state.tasks.map(task => 
+          task.id === id 
+            ? { ...task, ...updates, updatedAt: new Date() } 
+            : task
+        )
+      })),
+      
+      deleteTask: (id) => set((state) => ({
+        tasks: state.tasks.filter(task => task.id !== id)
+      })),
+      
+      setFilter: (filterUpdates) => set((state) => ({
+        filters: { ...state.filters, ...filterUpdates }
+      })),
+      
+      clearFilters: () => set({
+        filters: { priority: 'all', status: 'all' }
+      }),
+      
+      toggleTheme: () => set((state) => ({
+        theme: state.theme === 'light' ? 'dark' : 'light'
+      })),
+    }),
+    {
+      name: 'task-storage',
+      partialize: (state) => ({ 
+        tasks: state.tasks, 
+        filters: state.filters,
+        theme: state.theme 
+      }),
+    }
+  )
+);
+
+export default useTaskStore;
+```
+
+Also create a utility hook for filtered tasks at `/src/hooks/useFilteredTasks.ts`:
+
+```typescript
+import { useMemo } from 'react';
+import useTaskStore from '../store/taskStore';
+
+const useFilteredTasks = () => {
+  const { tasks, filters } = useTaskStore();
+  
+  const filteredTasks = useMemo(() => {
+    return tasks.filter(task => {
+      // Filter by priority
+      if (filters.priority !== 'all' && task.priority !== filters.priority) {
+        return false;
+      }
+      
+      // Filter by status
+      if (filters.status !== 'all' && task.status !== filters.status) {
+        return false;
+      }
+      
+      return true;
+    });
+  }, [tasks, filters]);
+  
+  return filteredTasks;
+};
+
+export default useFilteredTasks;
+```
+
+# Test Strategy:
+Create unit tests for the Zustand store using Vitest. Test each action (addTask, updateTask, deleteTask, setFilter, clearFilters, toggleTheme) to ensure they modify the state correctly. Verify that the persist middleware correctly saves and loads state from localStorage. Test the useFilteredTasks hook with various filter combinations to ensure it returns the expected filtered task list.

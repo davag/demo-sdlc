@@ -16,13 +16,13 @@
         "id": 2,
         "title": "Define TypeScript Interfaces and Data Models",
         "description": "Create TypeScript interfaces for the Task and FilterState data models as specified in the PRD.",
-        "details": "Create a file at `/src/types/index.ts` with the following content:\n\n```typescript\nexport interface Task {\n  id: string;\n  title: string;\n  description: string;\n  priority: 'high' | 'medium' | 'low';\n  status: 'todo' | 'in-progress' | 'completed';\n  createdAt: Date;\n  updatedAt: Date;\n}\n\nexport interface FilterState {\n  priority: 'all' | 'high' | 'medium' | 'low';\n  status: 'all' | 'todo' | 'in-progress' | 'completed';\n}\n\n// Theme type\nexport type Theme = 'light' | 'dark';\n\n// Color mapping for priority levels\nexport const PRIORITY_COLORS = {\n  high: 'text-red-500',\n  medium: 'text-yellow-500',\n  low: 'text-green-500'\n};\n\n// Status display names\nexport const STATUS_LABELS = {\n  'todo': 'To Do',\n  'in-progress': 'In Progress',\n  'completed': 'Completed'\n};\n```",
+        "details": "Create a file at `/src/types/index.ts` with the following content:\n\n```typescript\nexport interface Task {\n  id: string;\n  title: string;\n  description: string;\n  priority: 'high' | 'medium' | 'low';\n  status: 'todo' | 'in-progress' | 'completed';\n  createdAt: Date;\n  updatedAt: Date;\n}\n\nexport interface FilterState {\n  priority: 'all' | 'high' | 'medium' | 'low';\n  status: 'all' | 'todo' | 'in-progress' | 'completed';\n}\n\n// Theme type\nexport type Theme = 'light' | 'dark';\n\n// Color mapping for priority levels\nexport const PRIORITY_COLORS = {\n  high: 'text-red-500',\n  medium: 'text-yellow-500',\n  low: 'text-green-500'\n};\n\n// Status display names\nexport const STATUS_LABELS = {\n  'todo': 'To Do',\n  'in-progress': 'In Progress',\n  'completed': 'Completed'\n};\n```\n<info added on 2025-06-19T12:58:32.158Z>\nI've implemented the TypeScript interfaces and data models as specified in the PRD. The file has been created at `/src/types/index.ts` and includes all required interfaces and constants:\n\n- Task interface with all required properties (id, title, description, priority, status, timestamps)\n- FilterState interface for the filtering system\n- Theme type for theme switching\n- PRIORITY_COLORS constant for consistent visual styling\n- STATUS_LABELS constant for user-friendly display\n\nAdditionally, I've added:\n- PRIORITY_OPTIONS and STATUS_OPTIONS constants for dropdown/select options\n- Comprehensive JSDoc documentation\n- Type safety with `as const` assertions\n\nAll TypeScript compilation checks pass without errors, and the code is ready for use in the upcoming Zustand store implementation (Task #3).\n</info added on 2025-06-19T12:58:32.158Z>",
         "testStrategy": "Create unit tests using Vitest to verify that the TypeScript interfaces are correctly defined. Test that the type constraints work as expected by creating sample objects that conform to the interfaces and checking for TypeScript errors when invalid values are used.",
         "priority": "high",
         "dependencies": [
           1
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -39,7 +39,7 @@
             "description": "Create the Theme type definition to support light and dark mode functionality in the application.",
             "dependencies": [],
             "details": "In the same `/src/types/index.ts` file, add the Theme type definition as a union type of 'light' and 'dark'. This will be used for theme switching functionality throughout the application.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify the Theme type by using it in a sample variable declaration and checking for TypeScript compilation errors."
           },
           {
@@ -48,7 +48,7 @@
             "description": "Create a mapping between priority levels and their corresponding color classes for consistent styling across the application.",
             "dependencies": [],
             "details": "Add the PRIORITY_COLORS constant to the types file that maps each priority level ('high', 'medium', 'low') to its corresponding Tailwind CSS color class. This will ensure consistent color coding of priorities throughout the UI.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify that all priority levels from the Task interface have corresponding entries in the PRIORITY_COLORS object."
           },
           {
@@ -59,7 +59,7 @@
               3
             ],
             "details": "Add the STATUS_LABELS constant to the types file that maps each status value ('todo', 'in-progress', 'completed') to its user-friendly display name. This will be used to display status values consistently throughout the application.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify that all status values from the Task interface have corresponding entries in the STATUS_LABELS object."
           }
         ]
@@ -147,7 +147,7 @@
     ],
     "metadata": {
       "created": "2025-06-18T21:02:59.579Z",
-      "updated": "2025-06-19T10:22:50.355Z",
+      "updated": "2025-06-19T12:58:40.625Z",
       "description": "Tasks for master context"
     }
   }

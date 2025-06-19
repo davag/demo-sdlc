@@ -1,0 +1,81 @@
+# Task ID: 5
+# Title: Implement Theme Toggle and Header Components
+# Status: pending
+# Dependencies: 3
+# Priority: medium
+# Description: Create the ThemeToggle component and Header component with dark/light theme support using Tailwind CSS.
+# Details:
+1. Create ThemeToggle component at `/src/components/ThemeToggle.tsx`:
+```typescript
+import React, { useEffect } from 'react';
+import { Sun, Moon } from 'lucide-react';
+import useTaskStore from '../store/taskStore';
+
+const ThemeToggle: React.FC = () => {
+  const { theme, toggleTheme } = useTaskStore();
+  
+  // Apply theme class to document when theme changes
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
+  
+  return (
+    <button
+      onClick={toggleTheme}
+      className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+      aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+    >
+      {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+    </button>
+  );
+};
+
+export default ThemeToggle;
+```
+
+2. Create Header component at `/src/components/Header.tsx`:
+```typescript
+import React from 'react';
+import { CheckSquare } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
+
+const Header: React.FC = () => {
+  return (
+    <header className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700 py-4">
+      <div className="container mx-auto px-4 flex justify-between items-center">
+        <div className="flex items-center space-x-2">
+          <CheckSquare className="h-6 w-6 text-blue-500" />
+          <h1 className="text-xl font-bold text-gray-800 dark:text-white">Task Manager</h1>
+        </div>
+        
+        <ThemeToggle />
+      </div>
+    </header>
+  );
+};
+
+export default Header;
+```
+
+3. Update the main CSS file at `/src/index.css` to support dark mode:
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light dark;
+}
+
+body {
+  @apply bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100;
+  min-height: 100vh;
+}
+```
+
+# Test Strategy:
+Create unit tests for the ThemeToggle and Header components using Vitest and React Testing Library. Test that ThemeToggle correctly toggles the theme state in the store and applies the appropriate class to the document element. Verify that the Header component renders correctly with the app title and ThemeToggle component. Test accessibility by checking for proper ARIA attributes and keyboard navigation.

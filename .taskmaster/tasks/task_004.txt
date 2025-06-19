@@ -1,0 +1,367 @@
+# Task ID: 4
+# Title: Create Core UI Components
+# Status: pending
+# Dependencies: 2, 3
+# Priority: medium
+# Description: Develop the core UI components including TaskItem, TaskList, TaskForm, and FilterBar with proper TypeScript typing and Tailwind CSS styling.
+# Details:
+Create the following components:
+
+1. TaskItem component at `/src/components/TaskItem.tsx`:
+```typescript
+import React from 'react';
+import { Task, PRIORITY_COLORS, STATUS_LABELS } from '../types';
+import { Edit, Trash2, CheckCircle, Circle } from 'lucide-react';
+import useTaskStore from '../store/taskStore';
+
+interface TaskItemProps {
+  task: Task;
+  onEdit: (task: Task) => void;
+}
+
+const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit }) => {
+  const { updateTask, deleteTask } = useTaskStore();
+  
+  const handleStatusToggle = () => {
+    updateTask(task.id, {
+      status: task.status === 'completed' ? 'todo' : 'completed'
+    });
+  };
+  
+  const handleDelete = () => {
+    if (confirm('Are you sure you want to delete this task?')) {
+      deleteTask(task.id);
+    }
+  };
+  
+  return (
+    <div className="p-4 mb-3 border rounded-lg shadow-sm hover:shadow-md transition-shadow bg-white dark:bg-gray-800 dark:border-gray-700">
+      <div className="flex items-start justify-between">
+        <div className="flex items-start space-x-3">
+          <button 
+            onClick={handleStatusToggle}
+            className="mt-1 text-gray-500 hover:text-blue-500 transition-colors"
+            aria-label={task.status === 'completed' ? 'Mark as incomplete' : 'Mark as complete'}
+          >
+            {task.status === 'completed' ? 
+              <CheckCircle className="h-5 w-5 text-green-500" /> : 
+              <Circle className="h-5 w-5" />}
+          </button>
+          
+          <div className="flex-1">
+            <h3 className={`font-medium ${task.status === 'completed' ? 'line-through text-gray-500' : ''}`}>
+              {task.title}
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{task.description}</p>
+            <div className="flex items-center mt-2 space-x-2">
+              <span className={`text-xs px-2 py-1 rounded-full ${PRIORITY_COLORS[task.priority]} bg-opacity-10`}>
+                {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+              </span>
+              <span className="text-xs px-2 py-1 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                {STATUS_LABELS[task.status]}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex space-x-2">
+          <button 
+            onClick={() => onEdit(task)}
+            className="text-gray-500 hover:text-blue-500 transition-colors"
+            aria-label="Edit task"
+          >
+            <Edit className="h-4 w-4" />
+          </button>
+          <button 
+            onClick={handleDelete}
+            className="text-gray-500 hover:text-red-500 transition-colors"
+            aria-label="Delete task"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default TaskItem;
+```
+
+2. TaskList component at `/src/components/TaskList.tsx`:
+```typescript
+import React, { useState } from 'react';
+import TaskItem from './TaskItem';
+import TaskForm from './TaskForm';
+import useFilteredTasks from '../hooks/useFilteredTasks';
+import { Task } from '../types';
+
+const TaskList: React.FC = () => {
+  const filteredTasks = useFilteredTasks();
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  
+  const handleEdit = (task: Task) => {
+    setEditingTask(task);
+  };
+  
+  const handleEditComplete = () => {
+    setEditingTask(null);
+  };
+  
+  return (
+    <div className="mt-6">
+      {editingTask && (
+        <div className="mb-6">
+          <h2 className="text-lg font-medium mb-2">Edit Task</h2>
+          <TaskForm 
+            existingTask={editingTask} 
+            onComplete={handleEditComplete} 
+          />
+        </div>
+      )}
+      
+      {filteredTasks.length === 0 ? (
+        <div className="text-center py-10 text-gray-500 dark:text-gray-400">
+          <p>No tasks found with the current filters.</p>
+        </div>
+      ) : (
+        filteredTasks.map(task => (
+          <TaskItem 
+            key={task.id} 
+            task={task} 
+            onEdit={handleEdit} 
+          />
+        ))
+      )}
+    </div>
+  );
+};
+
+export default TaskList;
+```
+
+3. TaskForm component at `/src/components/TaskForm.tsx`:
+```typescript
+import React, { useState, useEffect } from 'react';
+import { Task } from '../types';
+import useTaskStore from '../store/taskStore';
+
+interface TaskFormProps {
+  existingTask?: Task;
+  onComplete?: () => void;
+}
+
+const TaskForm: React.FC<TaskFormProps> = ({ existingTask, onComplete }) => {
+  const { addTask, updateTask } = useTaskStore();
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [priority, setPriority] = useState<'high' | 'medium' | 'low'>('medium');
+  const [status, setStatus] = useState<'todo' | 'in-progress' | 'completed'>('todo');
+  const [error, setError] = useState('');
+  
+  useEffect(() => {
+    if (existingTask) {
+      setTitle(existingTask.title);
+      setDescription(existingTask.description);
+      setPriority(existingTask.priority);
+      setStatus(existingTask.status);
+    }
+  }, [existingTask]);
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    
+    if (!title.trim()) {
+      setError('Title is required');
+      return;
+    }
+    
+    try {
+      if (existingTask) {
+        updateTask(existingTask.id, {
+          title,
+          description,
+          priority,
+          status
+        });
+      } else {
+        addTask({
+          title,
+          description,
+          priority,
+          status
+        });
+        // Reset form after adding
+        setTitle('');
+        setDescription('');
+        setPriority('medium');
+        setStatus('todo');
+      }
+      
+      if (onComplete) {
+        onComplete();
+      }
+    } catch (err) {
+      setError('Failed to save task. Please try again.');
+      console.error(err);
+    }
+  };
+  
+  return (
+    <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border dark:border-gray-700">
+      {error && (
+        <div className="mb-4 p-2 bg-red-100 text-red-700 rounded-md text-sm">
+          {error}
+        </div>
+      )}
+      
+      <div className="mb-4">
+        <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Title *
+        </label>
+        <input
+          type="text"
+          id="title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          placeholder="Task title"
+          required
+        />
+      </div>
+      
+      <div className="mb-4">
+        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Description
+        </label>
+        <textarea
+          id="description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          placeholder="Task description"
+          rows={3}
+        />
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label htmlFor="priority" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Priority
+          </label>
+          <select
+            id="priority"
+            value={priority}
+            onChange={(e) => setPriority(e.target.value as 'high' | 'medium' | 'low')}
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          >
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+        
+        <div>
+          <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Status
+          </label>
+          <select
+            id="status"
+            value={status}
+            onChange={(e) => setStatus(e.target.value as 'todo' | 'in-progress' | 'completed')}
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          >
+            <option value="todo">To Do</option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+      </div>
+      
+      <div className="flex justify-end">
+        <button
+          type="submit"
+          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+        >
+          {existingTask ? 'Update Task' : 'Add Task'}
+        </button>
+      </div>
+    </form>
+  );
+};
+
+export default TaskForm;
+```
+
+4. FilterBar component at `/src/components/FilterBar.tsx`:
+```typescript
+import React from 'react';
+import useTaskStore from '../store/taskStore';
+import { Filter, X } from 'lucide-react';
+
+const FilterBar: React.FC = () => {
+  const { filters, setFilter, clearFilters } = useTaskStore();
+  
+  return (
+    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border dark:border-gray-700 mb-4">
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-lg font-medium flex items-center">
+          <Filter className="h-5 w-5 mr-2" />
+          Filters
+        </h2>
+        
+        <button
+          onClick={clearFilters}
+          className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 flex items-center"
+          aria-label="Clear all filters"
+        >
+          <X className="h-4 w-4 mr-1" />
+          Clear
+        </button>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="priorityFilter" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Priority
+          </label>
+          <select
+            id="priorityFilter"
+            value={filters.priority}
+            onChange={(e) => setFilter({ priority: e.target.value as 'all' | 'high' | 'medium' | 'low' })}
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          >
+            <option value="all">All Priorities</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+        
+        <div>
+          <label htmlFor="statusFilter" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Status
+          </label>
+          <select
+            id="statusFilter"
+            value={filters.status}
+            onChange={(e) => setFilter({ status: e.target.value as 'all' | 'todo' | 'in-progress' | 'completed' })}
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          >
+            <option value="all">All Statuses</option>
+            <option value="todo">To Do</option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default FilterBar;
+```
+
+# Test Strategy:
+Create unit tests for each component using Vitest and React Testing Library. Test rendering, user interactions (clicks, form submissions), and state changes. Verify that TaskItem correctly displays task information and handles status toggles and deletions. Test that TaskForm correctly handles both creation and editing modes. Verify that FilterBar correctly updates filter state. Test accessibility by checking for proper ARIA attributes and keyboard navigation.

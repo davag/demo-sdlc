@@ -1,0 +1,174 @@
+# Task ID: 7
+# Title: Implement Error Handling and Loading States
+# Status: pending
+# Dependencies: 6
+# Priority: low
+# Description: Add error boundaries, loading states, and proper error handling for async operations.
+# Details:
+1. Create an ErrorBoundary component at `/src/components/ErrorBoundary.tsx`:
+```typescript
+import React, { Component, ErrorInfo, ReactNode } from 'react';
+
+interface Props {
+  children: ReactNode;
+  fallback?: ReactNode;
+}
+
+interface State {
+  hasError: boolean;
+  error: Error | null;
+}
+
+class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    console.error('Error caught by ErrorBoundary:', error, errorInfo);
+  }
+
+  render(): ReactNode {
+    if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
+      
+      return (
+        <div className="p-4 m-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-center">
+          <h2 className="text-lg font-medium text-red-800 dark:text-red-400 mb-2">Something went wrong</h2>
+          <p className="text-sm text-red-600 dark:text-red-300">
+            {this.state.error?.message || 'An unexpected error occurred'}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-3 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
+          >
+            Reload Page
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+export default ErrorBoundary;
+```
+
+2. Create a LoadingSpinner component at `/src/components/LoadingSpinner.tsx`:
+```typescript
+import React from 'react';
+
+interface LoadingSpinnerProps {
+  size?: 'small' | 'medium' | 'large';
+  message?: string;
+}
+
+const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ 
+  size = 'medium', 
+  message = 'Loading...' 
+}) => {
+  const sizeClasses = {
+    small: 'h-4 w-4 border-2',
+    medium: 'h-8 w-8 border-3',
+    large: 'h-12 w-12 border-4'
+  };
+  
+  return (
+    <div className="flex flex-col items-center justify-center p-4">
+      <div 
+        className={`${sizeClasses[size]} rounded-full border-gray-300 border-t-blue-500 animate-spin`}
+        role="status"
+        aria-label="Loading"
+      />
+      {message && (
+        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{message}</p>
+      )}
+    </div>
+  );
+};
+
+export default LoadingSpinner;
+```
+
+3. Update the App component to use ErrorBoundary:
+```typescript
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Header from './components/Header';
+import TasksPage from './pages/TasksPage';
+import ErrorBoundary from './components/ErrorBoundary';
+
+const App: React.FC = () => {
+  return (
+    <ErrorBoundary>
+      <Router>
+        <div className="flex flex-col min-h-screen">
+          <Header />
+          <main className="flex-grow">
+            <Routes>
+              <Route path="/" element={<TasksPage />} />
+              {/* Add more routes here as needed */}
+            </Routes>
+          </main>
+          <footer className="py-4 text-center text-sm text-gray-500 dark:text-gray-400 border-t dark:border-gray-700">
+            <div className="container mx-auto px-4">
+              Task Management App &copy; {new Date().getFullYear()}
+            </div>
+          </footer>
+        </div>
+      </Router>
+    </ErrorBoundary>
+  );
+};
+
+export default App;
+```
+
+4. Create a custom hook for handling async operations at `/src/hooks/useAsync.ts`:
+```typescript
+import { useState, useCallback } from 'react';
+
+interface AsyncState<T> {
+  data: T | null;
+  loading: boolean;
+  error: Error | null;
+}
+
+type AsyncFunction<T> = (...args: any[]) => Promise<T>;
+
+export function useAsync<T>(asyncFunction: AsyncFunction<T>, immediate = false) {
+  const [state, setState] = useState<AsyncState<T>>({
+    data: null,
+    loading: immediate,
+    error: null,
+  });
+
+  const execute = useCallback(
+    async (...args: any[]) => {
+      setState({ data: null, loading: true, error: null });
+      try {
+        const data = await asyncFunction(...args);
+        setState({ data, loading: false, error: null });
+        return data;
+      } catch (error) {
+        setState({ data: null, loading: false, error: error as Error });
+        throw error;
+      }
+    },
+    [asyncFunction]
+  );
+
+  return { ...state, execute };
+}
+```
+
+# Test Strategy:
+Create unit tests for the ErrorBoundary and LoadingSpinner components using Vitest and React Testing Library. Test that ErrorBoundary correctly catches and displays errors. Create a test component that throws an error and verify that the ErrorBoundary renders the fallback UI. Test the LoadingSpinner component with different sizes and messages. Test the useAsync hook with both successful and failing async operations to ensure it correctly manages loading states and error handling.
